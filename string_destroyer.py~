@@ -92,7 +92,11 @@ def nand_assigner(nand_index):			#Assigns inputs and output to a NAND gate which
 				break
 		
 		
-		output_list[current_gate_number] = Gate_list[index_of_output]             
+		output_list[current_gate_number] = Gate_list[index_of_output] 
+		if(current_gate_number == 0):
+			output_list[current_gate_number] = output_pin
+		
+		            
 		gate_input_found_list[index_of_output] = gate_input_found_list[index_of_output] + 1	
 			
 	elif((copy_list[nand_index + 2] == "NAND") ):
@@ -125,6 +129,10 @@ def nand_assigner(nand_index):			#Assigns inputs and output to a NAND gate which
 		
 		
 		output_list[current_gate_number] = Gate_list[index_of_output]      
+		if(current_gate_number == 0):
+			output_list[current_gate_number] = output_pin
+		
+		
 		gate_input_found_list[index_of_output] = gate_input_found_list[index_of_output] + 1	
 	
 	
@@ -157,7 +165,7 @@ def string_destroyer(string_temp, input_coordinates, output, forbidden_coordinat
 	static_input_list = input_coordinates				#list of coordinates of inputs like a,b,c,d...
 	
 	global gate_input_list 
-	gate_input_list = [[[0,0],[0,0]]*total_gates				#list of coordinates of inputs to gates i.e. [[[g1_inpx1,g1_inpy1],[g1_inpx2,g1_inpy2]],[[..
+	gate_input_list = []			#list of coordinates of inputs to gates i.e. [[[g1_inpx1,g1_inpy1],[g1_inpx2,g1_inpy2]],[[..
 	
 	global output_list
 	output_list = [0]*total_gates										#list of coordinates of outputs of gates [[ox1,oy1],[ox2,oy2]...]
@@ -172,7 +180,7 @@ def string_destroyer(string_temp, input_coordinates, output, forbidden_coordinat
 	wire_length = 0	
 	
 	
-	output_list.append(output_pin)				#the topmost gate's output will be the output_pin specified by the user	
+	#output_list[0] = (output_pin)				#the topmost gate's output will be the output_pin specified by the user	
 		
 	possible_coordinates = [[x, y] for x in range(17) for y in range(17)]
 	
@@ -205,9 +213,11 @@ def string_destroyer(string_temp, input_coordinates, output, forbidden_coordinat
 	
 #string_destroyer("NAND(a,b)",[[0,1],[0,3]], [4,0],[[2,0],[9,9]])	
 		
-string_destroyer("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
+#string_destroyer("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
 
+#string_destroyer("NAND(NAND(b,c),a)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
 
+string_destroyer("NAND(NAND(a,b),NAND(c,d))",[[0,1],[0,3],[0,9],[0,11]],[10,0],[[3,3],[4,4])
 
 
 
