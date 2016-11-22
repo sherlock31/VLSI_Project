@@ -200,53 +200,46 @@ def string_extracter(string_temp, input_coordinates, output, forbidden_coordinat
 
 	print("Gate_list is", Gate_list)
 	print("Gate_inputs are", gate_input_list)
-	print("Gate_outputs are", output_list)
+	#print("Gate_outputs are", output_list)
 	print("static inputs are", static_input_list)
-	#print("final output pin is", output_pin)
+	print("final output pin is", output_pin)
 	
 	
-	
-#string_extracter("NAND(a,b)",[[0,1],[0,3]], [4,0],[[2,0],[9,9]])	
-#string_extracter("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
-#string_extracter("NAND(NAND(b,c),a)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
-#string_extracter("NAND(NAND(a,b),NAND(c,d))",[[0,1],[0,3],[0,9],[0,11]],[10,0],[[3,3],[4,4]])
-
-#string_extracter("NAND(NAND(a,NAND(b,c)),NAND(d,e))",[[0,1],[0,3],[0,9],[0,11],[5,0]],[10,0],[[3,3],[4,4]])
-
-
 #We are assuming a grid of 17 x 17, the function calculates minimum_wire_length between 2 points
-def minimum_length(start, destination, forbidden):
+def dijkstra_path(start, end, blocked):
 	
-	for i in range(17):
-		for j in range(17):
-			if([i,j] in forbidden):
-				blocked[i][j] = True
-			
-			else:
-				blocked[i][j] = Fals
-				
-	
-	X = len(blocked[0])
-    Y = len(blocked)
-    max_cost = X*Y
+    X = len(blocked[0])				# of columns
+    Y = len(blocked)				# of rows
+    max_cost = X*Y					#Maximum possible cose
     
-    current = start
-    visited = deepcopy(blocked)
-    cost = [[X*Y for i in range(X)] for j in range(Y)]
-    cost[start[0]][start[1]] = 1
+    current = start					#Starting node
+    visited = blocked				#Set all blocked nodes as visited
+    cost = [[X*Y for i in range(X)]
+            for j in range(Y)]		#Initialize cost matrix
+    cost[start[0]][start[1]] = 1	#Set start node cost to 1
+    
+    print("current is", current)
+    print("type of current is", type(current))
+    print("end is", end)
+    print("type of end is", type(end))
+    print("blocked is", blocked)
     
     while(True):
-        visited[current[0]][current[1]] = True
+        visited[current[0]][current[1]] = True	#Current node has been visited
 
-        nearby = [(current[0]+1,current[1]),(current[0]-1,current[1]),
-                  (current[0],current[1]+1),(current[0],current[1]-1)] 
+        nearby = [(current[0]+1,current[1]),
+                  (current[0]-1,current[1]),
+                  (current[0],current[1]+1),
+                  (current[0],current[1]-1)] 	#Possible nearby blocks
 		    
+		#Calulate the cost of the allowed nearby blocks
         for i in nearby:
             if not (i[0] == -1 or i[1] == -1 or i[0]>= X or i[1] >= Y
                 or blocked[i[0]][i[1]]):
                 cost[i[0]][i[1]] = min(cost[i[0]][i[1]],1+
                                    cost[current[0]][current[1]])
 			
+		#Calculate the minumum cost node among the unvisited
         min_cost = max_cost
         min_node = ()
         for i in range(len(visited)):
@@ -255,21 +248,20 @@ def minimum_length(start, destination, forbidden):
                     if cost[i][j]<min_cost:
                         min_cost = cost[i][j]
                         min_node = (i,j)
-        current = tuple(min_node)
+					
+        current = tuple(min_node)	#Set that node to be the next node
+        #Occurs when all blocks have been visited or graph is disconnected
         if(min_cost == max_cost):
-            break
-        
-        all_visited = True				
-        for i in visited:
-            for j in i:
-                all_visited = all_visited and j
-        if all_visited:
-            break;    
-            
+            break	   
+    
+	#Extract the necessary node costs
     length = [cost[i[0]][i[1]] if cost[i[0]][i[1]] < X*Y
-              else None for i in destination]
-            
+              else None for i in end]	#Set disconnected node lengths to None
+    print("cost is", cost)
+    
+    print("length is", length)        
     return length
+	
 
 
 
@@ -279,24 +271,45 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 
 	total_wire_length = 0
 	
+	blocked = [[None]*17]*17
+	
+	for i in range(17):
+		for j in range(17):
+			if([i,j] in forbidden_coordinates_list):
+				blocked[i][j] = True
+				
+			else:
+				blocked[i][j] = False
+	
+	
+	
 	for gate_number_index, gate_element in enumerate(gate_input_list):
 		
 			
-		start_coordinates = gate_input_list[gate_number_index][0]	#starting value of the distance finding problem is input to the gate
-		destination_coordinates = gate_element						#destination is the gate 
+		start_coordinates = tuple(gate_input_list[gate_number_index][0])	#starting value of the distance finding problem is input to the gate
 		
-		single_wire_length_1 = minimum_length(start_coordinates,destination_coordinates,forbidden_coordinates_list)	
-			
-		start_coordinates = gate_input_list[gate_number_index][1]	#starting value of the distance finding problem is input to the gate
-		destination_coordinates = gate_element						#destination is the gate 
+		arbit_temp = tuple(gate_coordinate_list[gate_number_index])
 		
-		single_wire_length_2 = minimum_length(start_coordinates,destination_coordinates,forbidden_coordinates_list)	
+		destination_coordinates = []						#destination is the gate 
+		destination_coordinates.append(arbit_temp)
+		
+		single_wire_length_1 = dijkstra_path(start_coordinates,destination_coordinates,deepcopy(blocked))	
 			
-		total_wire_length = total_wire_length + single_wire_length_1 + single_wire_length_2
+		start_coordinates = tuple(gate_input_list[gate_number_index][1])	#starting value of the distance finding problem is input to the gate
+		arbit_temp = tuple(gate_coordinate_list[gate_number_index])
+		
+		destination_coordinates = []						#destination is the gate 
+		destination_coordinates.append(arbit_temp)
+		
+		single_wire_length_2 = dijkstra_path(start_coordinates,destination_coordinates,deepcopy(blocked))	
+			
+		total_wire_length = total_wire_length + int(single_wire_length_1) + int(single_wire_length_2)
 		
 	
-	
-	final_output_length = minimum_length(gate_coordinate_list[0], output_node, forbidden_coordinates_list)
+	output_location = tuple(output_node)
+	output_list_temp = []
+	output_list_temp.append(output_location)
+	final_output_length = dijkstra_path(tuple(gate_coordinate_list[0]), output_list_temp, forbidden_coordinates_list)
 		
 	total_wire_length = total_wire_length + final_output_length
 
@@ -305,8 +318,6 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 
 
 def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coordinates_list):
-
-
 
 	for iteration in range(1000):		#unsure about number of iterations that will be required, search for a smarter approach here 
 	
@@ -416,8 +427,22 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 					
 	return gate_coordinate_list		#final coordinates of the gates after everything				
 				
+string_extracter("NAND(a,b)",[[0,1],[0,3]], [10,0],[[2,0],[9,9]])	
+#string_extracter("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
+#string_extracter("NAND(NAND(b,c),a)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
+#string_extracter("NAND(NAND(a,b),NAND(c,d))",[[0,1],[0,3],[0,9],[0,11]],[10,0],[[3,3],[4,4]])
 
-	
+#string_extracter("NAND(NAND(a,NAND(b,c)),NAND(d,e))",[[0,1],[0,3],[0,9],[0,11],[5,0]],[10,0],[[3,3],[4,4]])
+global gate_input_list	
+global Gate_list
+global output_pin
+global output_pin
+global forbidden_list 
 
+optimized_gate_coordinate_list = optimizer(gate_input_list, Gate_list, output_pin, forbidden_list)
+print("optimized gate list is", optimized_gate_coordinate_list)
+
+
+ 
 
 
