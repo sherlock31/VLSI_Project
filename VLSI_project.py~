@@ -1,5 +1,7 @@
 from pyeda.inter import *
 
+#### Classes for OR_Block and AND_Block defined in terms of NAND2 gates as stated in documentation
+
 class AND_Block:
 	def __init__ (self, name, index, inp1, inp2) :
 		self.m_name = name
@@ -22,6 +24,7 @@ class OR_Block:
 		str_temp = "OR_Block(" + self.m_inp1.__str__() + "," + self.m_inp2.__str__() + ")"
 		return str_temp
 		
+#### Classes for logical expression which have child classes AND gate and OR gate
 
 class LogicalOperation  :
   def __init__ ( self, name, type, inp ) :
@@ -109,9 +112,9 @@ class Connector:
     def getTo(self):
         return self.togate
 
-
+### Recursive function to convert multiple input AND gate into NAND2 gates
 def multiple_input_and_to_and_block ( multiple_input_and, index ) : #takes input and gate with multiple inputs
-	#should give output as final and block ie and block of min index which is at top of tree
+	#should give output as final AND block ie and block of min index which is at top of tree
 	no_of_inp = len(multiple_input_and.m_inp)
 	if (no_of_inp == 2):
 		tmp = AND_Block(multiple_input_and.m_name+"block",index,multiple_input_and.m_inp[0],multiple_input_and.m_inp[1])
@@ -120,27 +123,28 @@ def multiple_input_and_to_and_block ( multiple_input_and, index ) : #takes input
 	else :
 		tmp = AndGate (multiple_input_and.m_name, multiple_input_and.m_inp[:-1])
 		tmp1 = multiple_input_and_to_and_block(tmp, index+1)
-		return AND_Block("blah",index,tmp1,multiple_input_and.m_inp[len(multiple_input_and.m_inp)-1])
-	
+		return AND_Block("AND_Block",index,tmp1,multiple_input_and.m_inp[len(multiple_input_and.m_inp)-1])
+
+### Recursive function to convert multiple input OR gate into NAND2 gates	
 def multiple_input_or_to_or_block ( multiple_input_or, index ) : #takes input and gate with multiple inputs
-	#should give output as final or block ie or block of min index which is at top of tree
+	#should give output as final OR block ie or block of min index which is at top of tree
 	no_of_inp = len(multiple_input_or.m_inp)
 	if (no_of_inp == 2):
 		tmp = OR_Block(multiple_input_or.m_name+"block",index,multiple_input_or.m_inp[0],multiple_input_or.m_inp[1])
-		#print (tmp)
 		return tmp
 	else :
 		tmp = OrGate (multiple_input_or.m_name, multiple_input_or.m_inp[:-1])
 		tmp1 = multiple_input_or_to_or_block(tmp, index+1)
-		return OR_Block("blah",index,tmp1,multiple_input_or.m_inp[len(multiple_input_or.m_inp)-1])
+		return OR_Block("OR_Block",index,tmp1,multiple_input_or.m_inp[len(multiple_input_or.m_inp)-1])
 
 a, b, c, d = map(exprvar, "abcd")
+
+############### The expression to be converted to NAND2 form written here ################
 f1 = Or(~a & ~b & ~c, ~a & ~b & c, a & ~b & c, a & b & c, a & b & ~c)
-#f1 = Or(a & b & c, 0)
+
 f1m = espresso_exprs(f1)
 f_str = str(f1m)
 f_str = f_str.replace(" ", "")
-#print(f_str)
 
 nd_a = Input( "a" )
 nd_b = Input( "b" )
@@ -158,7 +162,7 @@ sub = f_str.split("And")
 sub.pop(0)
 and_gate_no = 0
 and_gates = []
-and_blocks = []         ################
+and_blocks = []         
 
 for i in sub:
 	i = i.replace("),","")
@@ -169,21 +173,25 @@ for i in sub:
 	for sig in and_inp:
 		g.m_inp.append(gate_dict[sig])
 	and_gates.append(g)	
-	and_blocks.append(multiple_input_and_to_and_block(g,0)) ##############
+	and_blocks.append(multiple_input_and_to_and_block(g,0)) 
 	and_gate_no = and_gate_no + 1
 
 or_gate = OrGate("or_gate",[])
 for i in and_gates:
 	or_gate.m_inp.append(i)
 
+print("")
+print("Final expression in terms of AND and OR")
 print(or_gate)
 
 or_gate_with_blocks = OrGate ("or_gate",[])
 for i in and_blocks:
 	or_gate_with_blocks.m_inp.append(i)
 
-print(multiple_input_or_to_or_block(or_gate_with_blocks,0))
-
+final_OR_block = multiple_input_or_to_or_block(or_gate_with_blocks,0)
+print("")
+print("Final NAND2 expression in terms of AND_Block and OR_Block")
+print(final_OR_block)
 
 
 
