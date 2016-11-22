@@ -276,12 +276,12 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 	for i in range(17):
 		for j in range(17):
 			if([i,j] in forbidden_coordinates_list):
-				blocked[i][j] = True
+				blocked[i][j] = 1
 				
 			else:
-				blocked[i][j] = False
+				blocked[i][j] = 0
 	
-	
+	blocked = [[i == 1 for i in j] for j in blocked] 
 	
 	for gate_number_index, gate_element in enumerate(gate_input_list):
 		
@@ -293,7 +293,7 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 		destination_coordinates = []						#destination is the gate 
 		destination_coordinates.append(arbit_temp)
 		
-		single_wire_length_1 = dijkstra_path(start_coordinates,destination_coordinates,deepcopy(blocked))	
+		single_wire_length_1 = dijkstra_path(deepcopy(start_coordinates),deepcopy(destination_coordinates),deepcopy(blocked))	
 			
 		start_coordinates = tuple(gate_input_list[gate_number_index][1])	#starting value of the distance finding problem is input to the gate
 		arbit_temp = tuple(gate_coordinate_list[gate_number_index])
@@ -301,17 +301,17 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 		destination_coordinates = []						#destination is the gate 
 		destination_coordinates.append(arbit_temp)
 		
-		single_wire_length_2 = dijkstra_path(start_coordinates,destination_coordinates,deepcopy(blocked))	
+		single_wire_length_2 = dijkstra_path(deepcopy(start_coordinates),deepcopy(destination_coordinates),deepcopy(blocked))	
 			
-		total_wire_length = total_wire_length + int(single_wire_length_1) + int(single_wire_length_2)
+		total_wire_length = total_wire_length + int(single_wire_length_1[0]) + int(single_wire_length_2[0])
 		
 	
 	output_location = tuple(output_node)
 	output_list_temp = []
 	output_list_temp.append(output_location)
-	final_output_length = dijkstra_path(tuple(gate_coordinate_list[0]), output_list_temp, forbidden_coordinates_list)
+	final_output_length = dijkstra_path(deepcopy(tuple(gate_coordinate_list[0])), deepcopy(output_list_temp), deepcopy(blocked))
 		
-	total_wire_length = total_wire_length + final_output_length
+	total_wire_length = total_wire_length + int(final_output_length[0])
 
 	return total_wire_length
 
@@ -395,8 +395,8 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 			#updating the input list also for the current move, that is if some gate has our current gate as input then the changed position of  
 			#current gate should be reflected there
 			
-			for k,index_1 in enumerate(copy_of_copy_of_gate_input_list):
-				for l,index_2 in enumerate(k):
+			for index_1,k in enumerate(copy_of_copy_of_gate_input_list):
+				for index_2,l in enumerate(k):
 					if(l == gate):
 						copy_gate_input_list[index_1][index_2] = new_move
 						
