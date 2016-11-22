@@ -1,3 +1,5 @@
+#CODE IN THIS FILE, gives an initial placement to gates of an input boolean expression (this part is working correctly), it then tries to find the optimum placement by using an algorithm somewhat similar to simulated annealing
+
 from nltk import word_tokenize	
 from copy import deepcopy
 import random 
@@ -5,12 +7,6 @@ import math
 
 alpha_values = {chr(i): (i - 97) for i in range(ord("a"), ord("a") + 26)} 		#for relation between alphabets and numbers
 list_of_alphabets = list(map(chr, range(97, 123)))
-
-
-#CODE IN THIS FILE, gives an initial placement to gates of an input boolean expression (this part is working correctly), it then tries to find the optimum placement by using an algorithm somewhat similar to simulated annealing(there are some issues in wire_length calculation which we will resolve today
-#Approach is right according to our understading
-
-#PLEASE NOTE THAT THERE IS SOME ISSUE WITH minimum_wire_length calculation, string extracter is working perfectly, we hope to resolve all the issues by tomorrow
 
 #for a given index in the copy list it iterates throught the boolean expression and returns the index after the brackets have been balanced and also the number of nand gates it encountered during the iteration
 
@@ -54,49 +50,13 @@ def nand_assigner(nand_index):			#Assigns inputs and output to a NAND gate which
 		
 		temp_inp1 = static_input_list[alpha_values[copy_list[nand_index + 2]]]	#extracting coordinates of the input from static_input_list
 		temp_inp2 = static_input_list[alpha_values[copy_list[nand_index + 3]]]
-		
-		gate_input_found_list[current_gate_number] = 2							#both the inputs are found
-		
 		gate_input_list.append([temp_inp1,temp_inp2])		#inputs are specified for the current gate 
 
-		#index_of_output = 0
-		
-		#for i in range(current_gate_number, -1, -1):		#index_of_output will be the latest NAND gate without both the inputs 
-		#	if((gate_input_found_list[i] == 0) or (gate_input_found_list[i] == 1) ):
-		#		index_of_output = i
-		#		break
-		
-		#output_list[current_gate_number] = Gate_list[index_of_output]		#output of the current gate is the most immediate gate without both the inputs
-		
-		#if(current_gate_number == 0):
-		#	output_list[current_gate_number] = output_pin
-		
-		#gate_input_found_list[index_of_output] = gate_input_found_list[index_of_output] + 1		#that gate now has an input which is our current gate 
-		
-		
 	elif((copy_list[nand_index + 2] in list_of_alphabets) and (copy_list[nand_index + 3] == "NAND")):	#first pure input and second is output from NAND
 		
 		temp_inp1 = static_input_list[alpha_values[copy_list[nand_index + 2]]]			#getting the coordinates of the pure input 
-		gate_input_found_list[current_gate_number] = gate_input_found_list[current_gate_number] + 1		
-		
 		temp_inp2 = Gate_list[current_gate_number + 1]									#Its input is output of next nand gate
-
 		gate_input_list.append([temp_inp1,temp_inp2])						#inputs are appended in the input list
-
-		#index_of_output = 0
-		
-		#for i in range(current_gate_number, -1, -1):
-		#	if((gate_input_found_list[i] == 0) or (gate_input_found_list[i] == 1) ):
-		#		index_of_output = i
-		#		break
-		
-		
-		#output_list[current_gate_number] = Gate_list[index_of_output] 
-		#if(current_gate_number == 0):
-		#	output_list[current_gate_number] = output_pin
-		
-		            
-		#gate_input_found_list[index_of_output] = gate_input_found_list[index_of_output] + 1	
 			
 	elif((copy_list[nand_index + 2] == "NAND") ):
 		
@@ -108,10 +68,7 @@ def nand_assigner(nand_index):			#Assigns inputs and output to a NAND gate which
 		if(copy_list[second_input_index] in list_of_alphabets):      #if the second input is a pure input 
 			
 			temp_inp2 = static_input_list[alpha_values[copy_list[second_input_index]]]	
-			gate_input_found_list[current_gate_number] = gate_input_found_list[current_gate_number] + 1
-				
 			gate_input_list.append([temp_inp1,temp_inp2])			
-			
 			
 		elif(copy_list[second_input_index] == "NAND"):					#if the second input is a NAND gate 
 			
@@ -119,27 +76,13 @@ def nand_assigner(nand_index):			#Assigns inputs and output to a NAND gate which
 			temp_inp2 = Gate_list[current_gate_number + 1 + nand_count + 1]
 			gate_input_list.append([temp_inp1,temp_inp2])			
 		
-		
-		#for i in range(current_gate_number, -1, -1):
-		#	if((gate_input_found_list[i] == 0) or (gate_input_found_list[i] == 1) ):
-		#		index_of_output = i
-		#		break
-		
-		
-		#output_list[current_gate_number] = Gate_list[index_of_output]      
-		#if(current_gate_number == 0):
-		#	output_list[current_gate_number] = output_pin
-		
-		
-		#gate_input_found_list[index_of_output] = gate_input_found_list[index_of_output] + 1	
-	
+
+#This function extracts out the gate inter conections from boolean expressions and give an initial placement to them
 	
 def string_extracter(string_temp, input_coordinates, output, forbidden_coordinates ):	#inputs: operation string, coordinates of the inputs
 																						#coordinates of the output, coordinates of the forbidden locations	
-	
 	temp_list = word_tokenize(string_temp)
 	temp_list = [x for x in temp_list if x != ',']				#temp_list will be list of "NAND", operands like a,b,c... and "(", ")" to show indentation 
-	
 	
 	global copy_list 
 	copy_list = deepcopy(temp_list)						#deepcopy
@@ -165,21 +108,12 @@ def string_extracter(string_temp, input_coordinates, output, forbidden_coordinat
 	global gate_input_list 
 	gate_input_list = []			#list of coordinates of inputs to gates i.e. [[[g1_inpx1,g1_inpy1],[g1_inpx2,g1_inpy2]],[[..
 	
-	global output_list
-	output_list = [0]*total_gates										#list of coordinates of outputs of gates [[ox1,oy1],[ox2,oy2]...]
-	
 	global output_pin
 	output_pin = output									#coordinates of output_pin
-	
-	global gate_input_found_list
-	gate_input_found_list = [0]*total_gates							#ith element will denote number of inputs found for the gate i.e 0,1 or 2
 	
 	global wire_length
 	wire_length = 0	
 	
-	
-	#output_list[0] = (output_pin)				#the topmost gate's output will be the output_pin specified by the user	
-		
 	possible_coordinates = [[x, y] for x in range(17) for y in range(17)]
 	
 	for element in forbidden_list:
@@ -194,22 +128,17 @@ def string_extracter(string_temp, input_coordinates, output, forbidden_coordinat
 	for index, element in enumerate(copy_list):				#iterating through the list
 		
 		if element == "NAND":								#NAND gate found
-			global current_gate_number
+			#global current_gate_number
 			current_gate_number = current_gate_number + 1	#first gate should be counted as 0 as we are using it to index stuff somewhere 
-			
-			#print("current_index at line 187 is", current_gate_number)
-			
 			nand_assigner(index)							#calling NAND assigner to determine inputs and outputs of the currently found NAND gate
 
 	print("Gate_list is", Gate_list)
 	print("Gate_inputs are", gate_input_list)
-	#print("Gate_outputs are", output_list)
 	print("static inputs are", static_input_list)
 	print("final output pin is", output_pin)
 	
 	
 #We are assuming a grid of 17 x 17, the function calculates minimum_wire_length between 2 points
-
 def dijkstra_path(start, end, blocked):
 	
     X = len(blocked[0])				# of columns
@@ -261,18 +190,10 @@ def dijkstra_path(start, end, blocked):
     length = [cost[i[0]][i[1]] if cost[i[0]][i[1]] < X*Y
               else None for i in end]	#Set disconnected node lengths to None
     
-    
-    
     #print("cost is", cost)
-   # length = [0]
-    #print("length is", length)        
-    #length = [0]
-    
+	#print("length is", length)        
     return length
 	
-
-
-
 #this function returns wirelength for a given configuration of gates, inputs and forbidden points in the grid
  	
 def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, forbidden_coordinates_list ):
@@ -283,6 +204,7 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 	
 	for i in range(17):
 		for j in range(17):
+			
 			if([i,j] in forbidden_coordinates_list):
 				blocked[i][j] = 1
 				
@@ -292,7 +214,6 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 	blocked = [[i == 1 for i in j] for j in blocked] 
 	
 	for gate_number_index, gate_element in enumerate(gate_input_list):
-		
 		
 		start_coordinates = tuple(gate_input_list[gate_number_index][0])	#starting value of the distance finding problem is input to the gate
 		
@@ -313,7 +234,6 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 			
 		total_wire_length = total_wire_length + int(single_wire_length_1[0]) + int(single_wire_length_2[0])
 		
-	
 	output_location = tuple(output_node)
 	output_list_temp = []
 	output_list_temp.append(output_location)
@@ -330,25 +250,20 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 	return total_wire_length
 
 
-
 def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coordinates_list):
 
 	print("Gate Input List received in optimizer:", gate_input_list)
 	print("Gate coordinates in optimizer:", gate_coordinate_list)
 
-
-
-	for iteration in range(1000):		#unsure about number of iterations that will be required, search for a smarter approach here 
+	for iteration in range(100):		#unsure about number of iterations that will be required, search for a smarter approach here 
 	
-		
 		copy_gate_input_list = deepcopy(gate_input_list)
 		copy_gate_coordinate_list = deepcopy(gate_coordinate_list)
 		
 		second_copy_of_gate_coordinate_list = deepcopy(copy_gate_coordinate_list)
 		
-		#total length of wires in correct 
+		#total length of wires in current configuration
 		old_length = wire_length_calculator(copy_gate_input_list,copy_gate_coordinate_list, output_node, forbidden_coordinates_list)	
-		
 		
 		for gate_index, gate in enumerate(second_copy_of_gate_coordinate_list):
 			
@@ -371,7 +286,6 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 				number_of_possible_moves = number_of_possible_moves - 1
 				illegal_moves.append([gate[0], gate[1] - 1])
 				
-			
 			if(gate[1] == 16):
 			
 				number_of_possible_moves = number_of_possible_moves - 1
@@ -405,12 +319,9 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 				all_possible_moves = [[gate[0] - 1, gate[1]],[gate[0] + 1, gate[1]], [gate[0], gate[1] - 1], [gate[0], gate[1] + 1]]
 				#print("all_possible_moves are", all_possible_moves)
 				
-				
 				for element in illegal_moves:	#removing the illegal_moves moves from all poossible moves 
 	
 					while element in all_possible_moves: all_possible_moves.remove(element)  	
-				
-				#this should be a single list element which is not the case right now 
 						
 				new_move = random.choice(all_possible_moves)  	#selecting one of the legal moves 
 				#print("new_move is ", new_move)
@@ -425,8 +336,6 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 					if(l == gate):
 						copy_gate_input_list[index_1][index_2] = new_move
 						
-				 
-				 
 			copy_gate_coordinate_list[gate_index] = new_move		 		#MISTAKE hai yaha, wrong dimension of list 
 			
 			#print("copy_gate_input_list at 420:",copy_gate_input_list)
@@ -451,13 +360,10 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 					gate_coordinate_list = deepcopy(copy_gate_coordinate_list)
 					gate_input_list = deepcopy(copy_gate_input_list)
 		
-				
-				
-					
 	return gate_coordinate_list		#final coordinates of the gates after everything				
 				
-string_extracter("NAND(a,b)",[[0,1],[0,3]], [10,0],[[2,0],[9,9]])	
-#string_extracter("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]]) #different expressions can be commented out to see the output and  initial 
+#string_extracter("NAND(a,b)",[[0,1],[0,3]], [10,0],[[2,0],[9,9]])	
+string_extracter("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]]) #different expressions can be commented out to see the output and  initial 
 																			   #placement							
 #string_extracter("NAND(NAND(b,c),a)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
 #string_extracter("NAND(NAND(a,b),NAND(c,d))",[[0,1],[0,3],[0,9],[0,11]],[10,0],[[3,3],[4,4]])
@@ -468,8 +374,6 @@ global Gate_list
 global output_pin
 global output_pin
 global forbidden_list 
-
-
 
 
 optimized_gate_coordinate_list = optimizer(gate_input_list, Gate_list, output_pin, forbidden_list)
