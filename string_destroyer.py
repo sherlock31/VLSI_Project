@@ -401,11 +401,16 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 				gate_input_list = deepcopy(copy_gate_input_list)
 					
 			else:
-				#do the probabilistic thing, see the PDF
-				r_thing_from_klmh = random.uniform(0, 1)
-				cost_difference = new_length - old_length
+				#do the probabilistic acceptance thing 
 				
-				if(r_thing_from_klmh < math.exp((-1)*(cost_difference)/old_length
+				cost_difference = new_length - old_length
+				probability_of_acceptance = math.exp(-cost_difference)
+				
+				if(random.random() <= probability_of_acceptance):
+					
+					gate_coordinate_list = deepcopy(copy_gate_coordinate_list)
+					gate_input_list = deepcopy(copy_gate_input_list)
+		
 				
 				
 					

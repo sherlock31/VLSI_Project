@@ -1,7 +1,7 @@
 from nltk import word_tokenize	
 from copy import deepcopy
 import random 
-
+import math
 
 alpha_values = {chr(i): (i - 97) for i in range(ord("a"), ord("a") + 26)} 		#for relation between alphabets and numbers
 list_of_alphabets = list(map(chr, range(97, 123)))
@@ -396,12 +396,21 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 				
 				
 			if(new_length <= old_length):
-				#accept the changes
+				#accept the changes, lists are updated
 				gate_coordinate_list = deepcopy(copy_gate_coordinate_list)
-				gate_input_found_list	
+				gate_input_list = deepcopy(copy_gate_input_list)
+					
 			else:
-				#do the probabilistic thing, see the PDF
+				#do the probabilistic acceptance thing 
 				
+				cost_difference = new_length - old_length
+				probability_of_acceptance = math.exp(-cost_difference)
+				
+				if(random.random() <= probability_of_acceptance):
+					
+					gate_coordinate_list = deepcopy(copy_gate_coordinate_list)
+					gate_input_list = deepcopy(copy_gate_input_list)
+		
 				
 				
 					
