@@ -1,7 +1,7 @@
 from nltk import word_tokenize	
 from copy import deepcopy
 import random 
-
+import math
 
 alpha_values = {chr(i): (i - 97) for i in range(ord("a"), ord("a") + 26)} 		#for relation between alphabets and numbers
 list_of_alphabets = list(map(chr, range(97, 123)))
@@ -131,7 +131,7 @@ def nand_assigner(nand_index):			#Assigns inputs and output to a NAND gate which
 		#gate_input_found_list[index_of_output] = gate_input_found_list[index_of_output] + 1	
 	
 	
-def string_destroyer(string_temp, input_coordinates, output, forbidden_coordinates ):	#inputs: operation string, coordinates of the inputs
+def string_extracter(string_temp, input_coordinates, output, forbidden_coordinates ):	#inputs: operation string, coordinates of the inputs
 																						#coordinates of the output, coordinates of the forbidden locations	
 	
 	temp_list = word_tokenize(string_temp)
@@ -206,12 +206,12 @@ def string_destroyer(string_temp, input_coordinates, output, forbidden_coordinat
 	
 	
 	
-#string_destroyer("NAND(a,b)",[[0,1],[0,3]], [4,0],[[2,0],[9,9]])	
-#string_destroyer("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
-#string_destroyer("NAND(NAND(b,c),a)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
-#string_destroyer("NAND(NAND(a,b),NAND(c,d))",[[0,1],[0,3],[0,9],[0,11]],[10,0],[[3,3],[4,4]])
+#string_extracter("NAND(a,b)",[[0,1],[0,3]], [4,0],[[2,0],[9,9]])	
+#string_extracter("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
+#string_extracter("NAND(NAND(b,c),a)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
+#string_extracter("NAND(NAND(a,b),NAND(c,d))",[[0,1],[0,3],[0,9],[0,11]],[10,0],[[3,3],[4,4]])
 
-#string_destroyer("NAND(NAND(a,NAND(b,c)),NAND(d,e))",[[0,1],[0,3],[0,9],[0,11],[5,0]],[10,0],[[3,3],[4,4]])
+#string_extracter("NAND(NAND(a,NAND(b,c)),NAND(d,e))",[[0,1],[0,3],[0,9],[0,11],[5,0]],[10,0],[[3,3],[4,4]])
 
 
 #We are assuming a grid of 17 x 17, the function calculates minimum_wire_length between 2 points
@@ -306,21 +306,112 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 
 def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coordinates_list):
 
+
+
 	for iteration in range(1000):		#unsure about number of iterations that will be required, search for a smarter approach here 
-		
+	
 		copy_gate_input_list = deepcopy(gate_input_list)
 		copy_gate_coordinate_list = deepcopy(gate_coordinate_list)
 		
+		second_copy_of_gate_coordinate_list = deepcopy(copy_gate_coordinate_list)
 		
-		for gate_index, gate in enumerate(gate_coordinate_list):
+		#total length of wires in correct 
+		old_length = wire_length_calculator(copy_gate_input_list,copy_gate_coordinate_list, output_node, forbidden_coordinates_list)	
+		
+		
+		for gate_index, gate in enumerate(second_copy_of_gate_coordinate_list):
 			
-			if((gate[0] != 0) or (gate[0] != 16) or (gate[1] != 0) or (gate[1] != 16) ): #i.e if the point is not at margins   			
-
+			number_of_possible_moves = 4		#this is the max possible moves, we will check for the restrictions and reduce it whenever move is blocked
+			
+			illegal_moves = [] 
+			
+			if(gate[0] == 0): 		#gate is at x wala boundary
+				
+				number_of_possible_moves = number_of_possible_moves - 1
+				illegal_moves.append([gate[0] -1, gate[1]])
+				
+			if(gate[0] == 16): 		#gate is at second x wala boundary
+			
+				number_of_possible_moves = number_of_possible_moves - 1
+				illegal_moves.append([gate[0] + 1, gate[1]])
+				
+			if(gate[1] == 0):		#y boundary 1
+				
+				number_of_possible_moves = number_of_possible_moves - 1
+				illegal_moves.append([gate[0], gate[1] - 1])
+				
+			
+			if(gate[1] == 16):
+			
+				number_of_possible_moves = number_of_possible_moves - 1
+				illegal_moves.append([gate[0], gate[1] + 1])
+			
+			#checking whether there is a blocked area or not at the future location 	
+			if(([gate[0] - 1, gate[1]] in forbidden_coordinates_list) or (([gate[0] - 1, gate[1]] in copy_gate_coordinate_list))):
+			
+				number_of_possible_moves = number_of_possible_moves - 1
+				illegal_moves.append([gate[0] - 1, gate[1] ])
+				
+				
+			if(([gate[0] + 1, gate[1]] in forbidden_coordinates_list) or (([gate[0] + 1, gate[1]] in copy_gate_coordinate_list))):
+			
+				number_of_possible_moves = number_of_possible_moves - 1
+				illegal_moves.append([gate[0] + 1, gate[1] ])
+			
+			if(([gate[0], gate[1] - 1] in forbidden_coordinates_list) or (([gate[0], gate[1] - 1] in copy_gate_coordinate_list))):
+			
+				number_of_possible_moves = number_of_possible_moves - 1
+				illegal_moves.append([gate[0], gate[1] - 1])
+				
+			if(([gate[0], gate[1] + 1] in forbidden_coordinates_list) or (([gate[0], gate[1] + 1] in copy_gate_coordinate_list))):
+			
+				number_of_possible_moves = number_of_possible_moves - 1
+				illegal_moves.append([gate[0], gate[1] + 1])
+			
+			if(number_of_possible_moves > 0):
+				random_selection_bit = random.randrange(number_of_possible_moves)	#to select one of the possible moves 
+			
+				all_possible_moves = [[gate[0] - 1, gate[1]],[gate[0] + 1, gate[1]], [gate[0], gate[1] - 1], [gate[0], gate[1] + 1]]
+				
+				for element in illegal_moves:	#removing the illegal_moves moves from all poossible moves 
 	
-
-#	print(temp_list)
+					while element in all_possible_moves: all_possible_moves.remove(element)  	
 	
-#string_destroyer("NAND(a,NAND(b,c))")
+				new_move = random.sample(all_possible_moves, 1)  	#selecting one of the legal moves 
+			
+			copy_of_copy_of_gate_input_list = deepcopy(copy_gate_input_list)
+			
+			#updating the input list also for the current move, that is if some gate has our current gate as input then the changed position of  
+			#current gate should be reflected there
+			
+			for k,index_1 in enumerate(copy_of_copy_of_gate_input_list):
+				for l,index_2 in enumerate(k):
+					if(l == gate):
+						copy_gate_input_list[index_1][index_2] = new_move
+						
+				 
+			copy_gate_coordinate_list[gate_index] = new_move
+			
+			new_length = wire_length_calculator(copy_gate_input_list,copy_gate_coordinate_list, output_node, forbidden_coordinates_list)	
+				
+				
+			if(new_length <= old_length):
+				#accept the changes, lists are updated
+				gate_coordinate_list = deepcopy(copy_gate_coordinate_list)
+				gate_input_list = deepcopy(copy_gate_input_list)
+					
+			else:
+				#do the probabilistic thing, see the PDF
+				r_thing_from_klmh = random.uniform(0, 1)
+				cost_difference = new_length - old_length
+				
+				if(r_thing_from_klmh < math.exp((-1)*(cost_difference)/old_length
+				
+				
+					
+	return gate_coordinate_list		#final coordinates of the gates after everything				
+				
+
 	
 
 
