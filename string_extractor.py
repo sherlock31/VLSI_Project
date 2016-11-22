@@ -222,9 +222,9 @@ def dijkstra_path(start, end, blocked):
             for j in range(Y)]		#Initialize cost matrix
     cost[start[0]][start[1]] = 1	#Set start node cost to 1
     
-    print("current is", current)
+    #print("current is", current)
     #print("type of current is", type(current))
-    print("end is", end)
+    #print("end is", end)
     #print("type of end is", type(end))
     #print("blocked is", blocked)
     
@@ -263,9 +263,9 @@ def dijkstra_path(start, end, blocked):
     
     
     
-    print("cost is", cost)
+    #print("cost is", cost)
    # length = [0]
-    print("length is", length)        
+    #print("length is", length)        
     #length = [0]
     
     return length
@@ -293,7 +293,7 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 	
 	for gate_number_index, gate_element in enumerate(gate_input_list):
 		
-		#DESTINATION mein locha	
+		
 		start_coordinates = tuple(gate_input_list[gate_number_index][0])	#starting value of the distance finding problem is input to the gate
 		
 		arbit_temp = tuple(gate_coordinate_list[gate_number_index])
@@ -320,8 +320,8 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 	
 	start_coordinates = tuple(gate_coordinate_list[0])
 	
-	print("start_coordinates at 316 are", start_coordinates)
-	print("end_coordinates at 317 are", output_list_temp)
+	#print("start_coordinates at 316 are", start_coordinates)
+	#print("end_coordinates at 317 are", output_list_temp)
 	
 	final_output_length = dijkstra_path(deepcopy(start_coordinates), deepcopy(output_list_temp), deepcopy(blocked))
 		
@@ -333,8 +333,14 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 
 def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coordinates_list):
 
+	print("Gate Input List received in optimizer:", gate_input_list)
+	print("Gate coordinates in optimizer:", gate_coordinate_list)
+
+
+
 	for iteration in range(1000):		#unsure about number of iterations that will be required, search for a smarter approach here 
 	
+		
 		copy_gate_input_list = deepcopy(gate_input_list)
 		copy_gate_coordinate_list = deepcopy(gate_coordinate_list)
 		
@@ -397,12 +403,17 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 				random_selection_bit = random.randrange(number_of_possible_moves)	#to select one of the possible moves 
 			
 				all_possible_moves = [[gate[0] - 1, gate[1]],[gate[0] + 1, gate[1]], [gate[0], gate[1] - 1], [gate[0], gate[1] + 1]]
+				#print("all_possible_moves are", all_possible_moves)
+				
 				
 				for element in illegal_moves:	#removing the illegal_moves moves from all poossible moves 
 	
 					while element in all_possible_moves: all_possible_moves.remove(element)  	
-	
-				new_move = random.sample(all_possible_moves, 1)  	#selecting one of the legal moves 
+				
+				#this should be a single list element which is not the case right now 
+						
+				new_move = random.choice(all_possible_moves)  	#selecting one of the legal moves 
+				#print("new_move is ", new_move)
 			
 			copy_of_copy_of_gate_input_list = deepcopy(copy_gate_input_list)
 			
@@ -415,9 +426,13 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 						copy_gate_input_list[index_1][index_2] = new_move
 						
 				 
-			copy_gate_coordinate_list[gate_index] = new_move
+				 
+			copy_gate_coordinate_list[gate_index] = new_move		 		#MISTAKE hai yaha, wrong dimension of list 
 			
-			new_length = wire_length_calculator(copy_gate_input_list,copy_gate_coordinate_list, output_node, forbidden_coordinates_list)	
+			#print("copy_gate_input_list at 420:",copy_gate_input_list)
+			#print("copy_gate_coordinate_list:" ,copy_gate_coordinate_list)
+			
+			new_length = wire_length_calculator(copy_gate_input_list, copy_gate_coordinate_list, output_node, forbidden_coordinates_list)	
 				
 				
 			if(new_length <= old_length):
@@ -442,7 +457,8 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 	return gate_coordinate_list		#final coordinates of the gates after everything				
 				
 string_extracter("NAND(a,b)",[[0,1],[0,3]], [10,0],[[2,0],[9,9]])	
-#string_extracter("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])		#different expressions can be commented out to see the output and placement
+#string_extracter("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]]) #different expressions can be commented out to see the output and  initial 
+																			   #placement							
 #string_extracter("NAND(NAND(b,c),a)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
 #string_extracter("NAND(NAND(a,b),NAND(c,d))",[[0,1],[0,3],[0,9],[0,11]],[10,0],[[3,3],[4,4]])
 
@@ -456,8 +472,8 @@ global forbidden_list
 
 
 
-#optimized_gate_coordinate_list = optimizer(gate_input_list, Gate_list, output_pin, forbidden_list)
-#print("optimized gate list is", optimized_gate_coordinate_list)
+optimized_gate_coordinate_list = optimizer(gate_input_list, Gate_list, output_pin, forbidden_list)
+print("optimized gate list is", optimized_gate_coordinate_list)
 
 
  
