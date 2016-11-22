@@ -97,7 +97,7 @@ def string_extracter(string_temp, input_coordinates, output, forbidden_coordinat
 	print("total_gates are", total_gates)		
 	
 	global Gate_list
-	Gate_list = [0,0]*total_gates										#Gate_list will be a list of coordinates of gates i.e. [[Gx1,Gy1],[Gx2,Gy2],...]
+	Gate_list = [0,0]*total_gates						#Gate_list will be a list of coordinates of gates i.e. [[Gx1,Gy1],[Gx2,Gy2],...]
 	
 	global forbidden_list 
 	forbidden_list = forbidden_coordinates				#list of forbidden coordinates
@@ -350,7 +350,7 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 				gate_input_list = deepcopy(copy_gate_input_list)
 					
 			else:
-				#do the probabilistic acceptance thing 
+				#do the probabilistic acceptance thing to ensure that we dont get stuck at local minima
 				
 				cost_difference = new_length - old_length
 				probability_of_acceptance = math.exp(-cost_difference)
@@ -374,7 +374,6 @@ global Gate_list
 global output_pin
 global output_pin
 global forbidden_list 
-
 
 optimized_gate_coordinate_list = optimizer(gate_input_list, Gate_list, output_pin, forbidden_list)
 print("optimized gate list is", optimized_gate_coordinate_list)
