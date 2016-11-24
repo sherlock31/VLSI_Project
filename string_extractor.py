@@ -7,7 +7,6 @@ import math
 import matplotlib.pyplot as plt
 
 
-
 alpha_values = {chr(i): (i - 97) for i in range(ord("a"), ord("a") + 26)} 		#for relation between alphabets and numbers
 list_of_alphabets = list(map(chr, range(97, 123)))
 

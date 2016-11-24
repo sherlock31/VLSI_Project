@@ -124,7 +124,8 @@ def get_nand_exp(inputs,gate):
 			copy_or[4].append(2)
 			return nand_table_to_nand_exp(copy_or)
 		else:
-			copy_nand = nand_unit
+			inputs2 = inputs
+			copy_nand = [['nand',None,1],[inputs2[0],0,None],[inputs2[1],0,None]]
 			return nand_table_to_nand_exp(copy_nand)
 	else:
 			expr = get_nand_exp(inputs[0:len(inputs)-1],gate)
@@ -308,7 +309,10 @@ def get_nand_exp(inputs,gate):
 	expr_nand = nand_table_to_nand_exp(table1)					
 	return expr_nand
 
-expr = 'and(a,or(b,c))'
+def nand_2_inputs_circuit(expr)
+	return table_to_nand_exp(exp_to_tree(expr))
+	
+expr = 'and(or(b,nand(c,c),d),nand(a,a),b)'
 table = exp_to_tree(expr)
 expr1 = table_to_nand_exp(table)
 print(expr1)

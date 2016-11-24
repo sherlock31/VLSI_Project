@@ -7,13 +7,12 @@ import math
 import matplotlib.pyplot as plt
 
 
-
 alpha_values = {chr(i): (i - 97) for i in range(ord("a"), ord("a") + 26)} 		#for relation between alphabets and numbers
 list_of_alphabets = list(map(chr, range(97, 123)))
 
 global total_wirelength_list
 
-total_wirelength_list = []
+total_wirelength_list = []o
 
 
 #for a given index in the copy list it iterates throught the boolean expression and returns the index after the brackets have been balanced and also the number of nand gates it encountered during the iteration
@@ -399,7 +398,8 @@ plt.plot(arbit_index_list,total_wirelength_list)
 
 print("wire_length's progress is", total_wirelength_list)
 
-plt.xlabel('nume
+plt.xlabel('number_of_iterations')
+plt.ylabel('Wirelength/Cost')
 plt.show()
 
  

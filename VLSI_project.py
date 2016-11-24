@@ -96,6 +96,13 @@ class NotGate(LogicalOperation):
         if a == True:
         	return False
         return True
+        
+    def __str__ ( self ) :
+    	str_temp = ""
+    	for i in range(len(self.m_inp)) :
+    		str_temp = str_temp + self.m_inp[i].__str__() + "," 
+    	str_temp = str_temp[:-1]
+    	return "NAND( " + str_temp + ","+str_temp+" )"
     
 
 class Connector:
@@ -140,82 +147,120 @@ def multiple_input_or_to_or_block ( multiple_input_or, index ) : #takes input an
 a, b, c, d = map(exprvar, "abcd")
 
 ############### The expression to be converted to NAND2 form written here ################
-txt = open("inp_file.txt")
-from_file = txt.read().split()
-print(from_file)
-f1 = False
-for i in from_file:
-	if(i[0]=='0'):
-		tmp = ~a
-	else :
-		tmp = a
-	if(i[1]=='0'):
-		tmp = tmp & ~b
-	else :
-		tmp = tmp & b
-	if(i[2]=='0') : 
-		tmp = tmp & ~c
-	else :
-		tmp = tmp & c
-	f1 = f1 | tmp
+
+#def bracket_equaliser(current_index):
 	
-f1dnf = f1.to_dnf()
+#	global copy_list
+	
+#	braket_equal = 1				# expression like nand(nand(a,b), c), we want to reach c by using this function, equalizing internal brackets
 
-#f1 = Or(~a & ~b & ~c, ~a & ~b & c, a & ~b & c, a & b & c, a & b & ~c)
-
-f1m = espresso_exprs(f1dnf)
-f_str = str(f1m)
-f_str = f_str.replace(" ", "")
-
-nd_a = Input( "a" )
-nd_b = Input( "b" )
-nd_c = Input( "c" )
-nd_d = Input( "d" )
-
-not_a = NotGate( "~a", [nd_a])
-not_b = NotGate( "~b", [nd_b])
-not_c = NotGate( "~c", [nd_c])
-not_d = NotGate( "~d", [nd_d])
-
-gate_dict = { 'a' : nd_a , 'b' : nd_b , 'c' : nd_c , 'd' : nd_d , '~a' : not_a ,'~b' : not_b ,'~c' : not_c ,'~d' : not_d  }
-
-sub = f_str.split("And")
-sub.pop(0)
-and_gate_no = 0
-and_gates = []
-and_blocks = []         
-
-for i in sub:
-	i = i.replace("),","")
-	i = i.replace(")","")
-	i = i.replace("(","")
-	and_inp = i.split(",")
-	g = AndGate("a_gate"+str(and_gate_no),[])
-	for sig in and_inp:
-		g.m_inp.append(gate_dict[sig])
-	and_gates.append(g)	
-	and_blocks.append(multiple_input_and_to_and_block(g,0)) 
-	and_gate_no = and_gate_no + 1
-
-or_gate = OrGate("or_gate",[])
-for i in and_gates:
-	or_gate.m_inp.append(i)
-
-print("")
-print("Final expression in terms of AND and OR")
-print(or_gate)
-
-or_gate_with_blocks = OrGate ("or_gate",[])
-for i in and_blocks:
-	or_gate_with_blocks.m_inp.append(i)
-
-final_OR_block = multiple_input_or_to_or_block(or_gate_with_blocks,0)
-print("")
-print("Final NAND2 expression in terms of AND_Block and OR_Block")
-print(final_OR_block)
+#	iterating_index = current_index + 1			#index of the first bracket i.e. the bracket after the second nand in the above example expression
+#	nand_count = 0
+	
+#	while(braket_equal != 0):			#till all the brackets are not equal
+		
+#		iterating_index = iterating_index + 1 	#
+		
+#		if(copy_list[iterating_index] == "("):
+#			braket_equal = braket_equal + 1
+			
+#		elif(copy_list[iterating_index] == ")"):
+#			braket_equal = braket_equal - 1
+		
+#		elif(copy_list[iterating_index] == "nand"):
+#			nand_count = nand_count + 1
+#		
+#	return (iterating_index + 1, nand_count) 		#index of the element after brackets has been matched		
 
 
 
 
 
+
+
+def input_from_text_file(filename):
+
+	txt = open(filename)
+	from_file = txt.read().split()
+	print(from_file)
+	f1 = False
+	for i in from_file:
+		if(i[0]=='0'):
+			tmp = ~a
+		else :
+			tmp = a
+		if(i[1]=='0'):
+			tmp = tmp & ~b
+		else :
+			tmp = tmp & b
+		if(i[2]=='0') : 
+			tmp = tmp & ~c
+		else :
+			tmp = tmp & c
+		f1 = f1 | tmp
+	
+	f1dnf = f1.to_dnf()
+
+	#f1 = Or(~a & ~b & ~c, ~a & ~b & c, a & ~b & c, a & b & c, a & b & ~c)
+
+	f1m = espresso_exprs(f1dnf)
+	f_str = str(f1m)
+	f_str = f_str.replace(" ", "")
+
+	nd_a = Input( "a" )
+	nd_b = Input( "b" )
+	nd_c = Input( "c" )
+	nd_d = Input( "d" )
+
+	not_a = NotGate( "~a", [nd_a])
+	not_b = NotGate( "~b", [nd_b])
+	not_c = NotGate( "~c", [nd_c])
+	not_d = NotGate( "~d", [nd_d])
+
+	gate_dict = { 'a' : nd_a , 'b' : nd_b , 'c' : nd_c , 'd' : nd_d , '~a' : not_a ,'~b' : not_b ,'~c' : not_c ,'~d' : not_d  }
+
+	sub = f_str.split("And")
+	sub.pop(0)
+	and_gate_no = 0
+	and_gates = []
+	and_blocks = []         
+
+	for i in sub:
+		i = i.replace("),","")
+		i = i.replace(")","")
+		i = i.replace("(","")
+		and_inp = i.split(",")
+		g = AndGate("a_gate"+str(and_gate_no),[])
+		for sig in and_inp:
+			g.m_inp.append(gate_dict[sig])
+		and_gates.append(g)	
+		and_blocks.append(multiple_input_and_to_and_block(g,0)) 
+		and_gate_no = and_gate_no + 1
+
+	or_gate = OrGate("or_gate",[])
+	for i in and_gates:
+		or_gate.m_inp.append(i)
+
+	#or_gate.replace(' ','')
+	print("")
+	print("Final expression in terms of AND and OR")
+	#print(str(or_gate).replace(" ", ""))			#I Have to give this thing to Sudipto 
+
+	global final_output
+	
+	final_output = str(or_gate).replace(" ", "")	
+	print(final_output)
+	
+	return final_output
+	
+	#or_gate_with_blocks = OrGate ("or_gate",[])
+	#for i in and_blocks:
+		#or_gate_with_blocks.m_inp.append(i)
+
+	#final_OR_block = multiple_input_or_to_or_block(or_gate_with_blocks,0)
+	#print("")
+	#print("Final NAND2 expression in terms of AND_Block and OR_Block")
+	#print(final_OR_block)
+
+input_from_text_file("inp_file.txt")
 
