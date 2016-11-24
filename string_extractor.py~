@@ -12,7 +12,7 @@ list_of_alphabets = list(map(chr, range(97, 123)))
 
 global total_wirelength_list
 
-total_wirelength_list = []o
+total_wirelength_list = []
 
 
 #for a given index in the copy list it iterates throught the boolean expression and returns the index after the brackets have been balanced and also the number of nand gates it encountered during the iteration

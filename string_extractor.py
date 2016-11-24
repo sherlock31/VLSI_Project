@@ -377,7 +377,7 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 #string_extracter("nand(nand(b,c),a)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
 #string_extracter("nand(nand(a,b),nand(c,d))",[[0,1],[0,3],[0,9],[0,11]],[10,0],[[3,3],[4,4]])
 
-string_extracter("nand(nand(a,nand(b,c)),nand(d,e))",[[0,1],[0,3],[0,9],[0,11],[5,0]],[10,0],[[3,3],[4,4]])
+#string_extracter("nand(nand(a,nand(b,c)),nand(d,e))",[[0,1],[0,3],[0,9],[0,11],[5,0]],[10,0],[[3,3],[4,4]])
 
 global gate_input_list	
 global Gate_list

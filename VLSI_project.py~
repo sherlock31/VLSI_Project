@@ -148,30 +148,6 @@ a, b, c, d = map(exprvar, "abcd")
 
 ############### The expression to be converted to NAND2 form written here ################
 
-#def bracket_equaliser(current_index):
-	
-#	global copy_list
-	
-#	braket_equal = 1				# expression like nand(nand(a,b), c), we want to reach c by using this function, equalizing internal brackets
-
-#	iterating_index = current_index + 1			#index of the first bracket i.e. the bracket after the second nand in the above example expression
-#	nand_count = 0
-	
-#	while(braket_equal != 0):			#till all the brackets are not equal
-		
-#		iterating_index = iterating_index + 1 	#
-		
-#		if(copy_list[iterating_index] == "("):
-#			braket_equal = braket_equal + 1
-			
-#		elif(copy_list[iterating_index] == ")"):
-#			braket_equal = braket_equal - 1
-		
-#		elif(copy_list[iterating_index] == "nand"):
-#			nand_count = nand_count + 1
-#		
-#	return (iterating_index + 1, nand_count) 		#index of the element after brackets has been matched		
-
 
 
 
@@ -262,5 +238,5 @@ def input_from_text_file(filename):
 	#print("Final NAND2 expression in terms of AND_Block and OR_Block")
 	#print(final_OR_block)
 
-input_from_text_file("inp_file.txt")
+#input_from_text_file("inp_file.txt")
 
