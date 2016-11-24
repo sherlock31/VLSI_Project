@@ -1,12 +1,20 @@
-#CODE IN THIS FILE, gives an initial placement to gates of an input boolean expression , it then tries to find the optimum placement by using an algorithm somewhat similar to simulated annealing
+#CODE IN THIS FILE, gives an initial placement to gates of an input boolean expression, it then tries to find the optimum placement by using an algorithm somewhat similar to simulated annealing
 
 from nltk import word_tokenize	
 from copy import deepcopy
 import random 
 import math
+import matplotlib.pyplot as plt
+
+
 
 alpha_values = {chr(i): (i - 97) for i in range(ord("a"), ord("a") + 26)} 		#for relation between alphabets and numbers
 list_of_alphabets = list(map(chr, range(97, 123)))
+
+global total_wirelength_list
+
+total_wirelength_list = []
+
 
 #for a given index in the copy list it iterates throught the boolean expression and returns the index after the brackets have been balanced and also the number of nand gates it encountered during the iteration
 
@@ -265,6 +273,8 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 		#total length of wires in current configuration
 		old_length = wire_length_calculator(copy_gate_input_list,copy_gate_coordinate_list, output_node, forbidden_coordinates_list)	
 		
+		total_wirelength_list.append(old_length)
+		
 		for gate_index, gate in enumerate(second_copy_of_gate_coordinate_list):
 			
 			number_of_possible_moves = 4		#this is the max possible moves, we will check for the restrictions and reduce it whenever move is blocked
@@ -379,6 +389,18 @@ global forbidden_list
 optimized_gate_coordinate_list = optimizer(gate_input_list, Gate_list, output_pin, forbidden_list)
 print("optimized gate list is", optimized_gate_coordinate_list)
 
+arbit_index_list = []
+
+for index,element in enumerate(total_wirelength_list):
+	arbit_index_list.append(index)
+
+	
+plt.plot(arbit_index_list,total_wirelength_list)	
+
+print("wire_length's progress is", total_wirelength_list)
+
+plt.xlabel('nume
+plt.show()
 
  
 

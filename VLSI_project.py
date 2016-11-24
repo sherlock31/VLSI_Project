@@ -140,9 +140,30 @@ def multiple_input_or_to_or_block ( multiple_input_or, index ) : #takes input an
 a, b, c, d = map(exprvar, "abcd")
 
 ############### The expression to be converted to NAND2 form written here ################
-f1 = Or(~a & ~b & ~c, ~a & ~b & c, a & ~b & c, a & b & c, a & b & ~c)
+txt = open("inp_file.txt")
+from_file = txt.read().split()
+print(from_file)
+f1 = False
+for i in from_file:
+	if(i[0]=='0'):
+		tmp = ~a
+	else :
+		tmp = a
+	if(i[1]=='0'):
+		tmp = tmp & ~b
+	else :
+		tmp = tmp & b
+	if(i[2]=='0') : 
+		tmp = tmp & ~c
+	else :
+		tmp = tmp & c
+	f1 = f1 | tmp
+	
+f1dnf = f1.to_dnf()
 
-f1m = espresso_exprs(f1)
+#f1 = Or(~a & ~b & ~c, ~a & ~b & c, a & ~b & c, a & b & c, a & b & ~c)
+
+f1m = espresso_exprs(f1dnf)
 f_str = str(f1m)
 f_str = f_str.replace(" ", "")
 
@@ -192,6 +213,7 @@ final_OR_block = multiple_input_or_to_or_block(or_gate_with_blocks,0)
 print("")
 print("Final NAND2 expression in terms of AND_Block and OR_Block")
 print(final_OR_block)
+
 
 
 
