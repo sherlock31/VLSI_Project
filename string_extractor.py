@@ -260,7 +260,7 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 		copy_gate_input_list = deepcopy(gate_input_list)
 		copy_gate_coordinate_list = deepcopy(gate_coordinate_list)
 		
-		second_copy_of_gate_coordinate_list = deepcopy(copy_gate_coordinate_list)
+		second_copy_of_gate_coordinate_list = deepcopy(copy_gate_coordinate_list)	#second copy to iterate over
 		
 		#total length of wires in current configuration
 		old_length = wire_length_calculator(copy_gate_input_list,copy_gate_coordinate_list, output_node, forbidden_coordinates_list)	
@@ -353,9 +353,9 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 				#do the probabilistic acceptance thing to ensure that we dont get stuck at local minima
 				
 				cost_difference = new_length - old_length
-				probability_of_acceptance = math.exp(-cost_difference)
+				probability_of_acceptance = math.exp(-cost_difference)			#probability should be high if cost difference is low
 				
-				if(random.random() <= probability_of_acceptance):
+				if(random.random() <= probability_of_acceptance):				#random.random() generates a random number between 0 and 1
 					
 					gate_coordinate_list = deepcopy(copy_gate_coordinate_list)
 					gate_input_list = deepcopy(copy_gate_input_list)
@@ -363,12 +363,12 @@ def optimizer(gate_input_list, gate_coordinate_list, output_node, forbidden_coor
 	return gate_coordinate_list		#final coordinates of the gates after everything				
 				
 #string_extracter("NAND(a,b)",[[0,1],[0,3]], [10,0],[[2,0],[9,9]])	
-string_extracter("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]]) #different expressions can be commented out to see the output and  initial 
+#string_extracter("NAND(a,NAND(b,c)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]]) #different expressions can be commented out to see the output and  initial 
 																			   #placement							
 #string_extracter("NAND(NAND(b,c),a)",[[0,1],[0,3],[0,9]],[10,0],[[3,3],[4,4]])
 #string_extracter("NAND(NAND(a,b),NAND(c,d))",[[0,1],[0,3],[0,9],[0,11]],[10,0],[[3,3],[4,4]])
 
-#string_extracter("NAND(NAND(a,NAND(b,c)),NAND(d,e))",[[0,1],[0,3],[0,9],[0,11],[5,0]],[10,0],[[3,3],[4,4]])
+string_extracter("NAND(NAND(a,NAND(b,c)),NAND(d,e))",[[0,1],[0,3],[0,9],[0,11],[5,0]],[10,0],[[3,3],[4,4]])
 global gate_input_list	
 global Gate_list
 global output_pin
