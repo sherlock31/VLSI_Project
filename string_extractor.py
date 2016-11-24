@@ -121,7 +121,7 @@ def string_extracter(string_temp, input_coordinates, output, forbidden_coordinat
 	global wire_length
 	wire_length = 0	
 	
-	possible_coordinates = [[x, y] for x in range(17) for y in range(17)]
+	possible_coordinates = [[x, y] for x in range(20) for y in range(20)]
 	
 	for element in forbidden_list:
 	
@@ -145,7 +145,7 @@ def string_extracter(string_temp, input_coordinates, output, forbidden_coordinat
 	print("final output pin is", output_pin)
 	
 	
-#We are assuming a grid of 17 x 17, the function calculates minimum_wire_length between 2 points
+#We are assuming a grid of 20 x 20, the function calculates minimum_wire_length between 2 points
 def dijkstra_path(start, end, blocked):
 	
     X = len(blocked[0])				# of columns
@@ -207,10 +207,10 @@ def wire_length_calculator(gate_input_list, gate_coordinate_list, output_node, f
 
 	total_wire_length = 0
 	
-	blocked = [[None]*17]*17
+	blocked = [[None]*20]*20
 	
-	for i in range(17):
-		for j in range(17):
+	for i in range(20):
+		for j in range(20):
 			
 			if([i,j] in forbidden_coordinates_list):
 				blocked[i][j] = 1
@@ -386,6 +386,7 @@ global output_pin
 global forbidden_list 
 
 optimized_gate_coordinate_list = optimizer(gate_input_list, Gate_list, output_pin, forbidden_list)
+
 print("optimized gate list is", optimized_gate_coordinate_list)
 
 arbit_index_list = []
